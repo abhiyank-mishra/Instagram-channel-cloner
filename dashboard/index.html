@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Upload Manager — Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet"/>
+  <style>
+    :root{--bg:#08080e;--bg2:#0e0e1a;--bg3:#161630;--bg4:#1e1e42;--accent:#7c5cfc;--accentG:rgba(124,92,252,.2);--txt:#eef;--txt2:#88a;--txt3:#556;--border:#252548;--red:#ff4a6e;--green:#4affa0;--yellow:#fc4;--blue:#4ac4ff;--radius:10px;}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;font-size:13px}
+    .icon{font-family:'Material Symbols Rounded';font-size:20px;vertical-align:middle}
+
+    /* Header */
+    .hdr{display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:56px;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}
+    .hdr-left{display:flex;align-items:center;gap:12px;font-weight:700;font-size:16px}
+    .hdr-right{display:flex;gap:10px;align-items:center}
+    .day-badge{background:linear-gradient(135deg,var(--accent),#a855f7);padding:6px 16px;border-radius:20px;font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px}
+
+    /* Stats Bar */
+    .stats{display:flex;gap:16px;padding:20px 28px;background:var(--bg2);border-bottom:1px solid var(--border)}
+    .stat-card{flex:1;padding:16px 20px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);display:flex;align-items:center;gap:14px}
+    .stat-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px}
+    .stat-icon.dl{background:rgba(74,196,255,.12);color:var(--blue)}
+    .stat-icon.ed{background:rgba(124,92,252,.12);color:var(--accent)}
+    .stat-icon.up{background:rgba(74,255,160,.12);color:var(--green)}
+    .stat-icon.tot{background:rgba(252,204,74,.12);color:var(--yellow)}
+    .stat-num{font-size:24px;font-weight:800}
+    .stat-label{font-size:10px;color:var(--txt2);text-transform:uppercase;letter-spacing:.8px;margin-top:2px}
+
+    /* Filter Bar */
+    .filters{display:flex;gap:8px;padding:16px 28px;align-items:center;flex-wrap:wrap}
+    .filter-btn{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--txt2);cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;transition:.15s}
+    .filter-btn:hover{border-color:var(--accent);color:var(--txt)}
+    .filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+    .search-box{margin-left:auto;padding:7px 14px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);color:var(--txt);font-family:inherit;font-size:12px;width:220px;outline:none}
+    .search-box:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accentG)}
+
+    /* Reel Grid */
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;padding:16px 28px 40px}
+    .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:.2s}
+    .card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,.3)}
+    .card-top{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--bg3);border-bottom:1px solid var(--border)}
+    .card-num{font-weight:800;font-size:14px;color:var(--accent);min-width:50px}
+    .card-movie{flex:1;font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .card-badges{display:flex;gap:4px}
+    .badge{padding:3px 8px;border-radius:4px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+    .badge-dl{background:rgba(74,196,255,.12);color:var(--blue)}
+    .badge-ed{background:rgba(124,92,252,.12);color:var(--accent)}
+    .badge-up{background:rgba(74,255,160,.12);color:var(--green)}
+    .badge-no{background:rgba(85,85,106,.15);color:var(--txt3)}
+    .badge-tags{background:rgba(252,204,74,.12);color:var(--yellow)}
+
+    .card-body{padding:14px 16px}
+    .card-desc{font-size:11px;color:var(--txt2);line-height:1.5;max-height:42px;overflow:hidden;margin-bottom:10px}
+    .card-meta{display:flex;gap:12px;font-size:11px;color:var(--txt3);margin-bottom:12px}
+    .card-meta span{display:flex;align-items:center;gap:3px}
+    .card-meta .icon{font-size:14px}
+
+    .card-actions{display:flex;gap:6px;flex-wrap:wrap}
+    .act{padding:5px 12px;border-radius:6px;border:none;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;transition:.15s}
+    .act .icon{font-size:14px}
+    .act-edit{background:var(--bg4);color:var(--accent);border:1px solid var(--border)}
+    .act-edit:hover{background:var(--accent);color:#fff}
+    .act-tags{background:var(--bg4);color:var(--yellow);border:1px solid var(--border)}
+    .act-tags:hover{background:var(--yellow);color:#000}
+    .act-preview{background:var(--bg4);color:var(--blue);border:1px solid var(--border)}
+    .act-preview:hover{background:var(--blue);color:#000}
+    .act-upload{background:var(--green);color:#000}
+    .act-upload:hover{opacity:.85}
+    .act-delete{background:var(--bg4);color:var(--red);border:1px solid var(--border)}
+    .act-delete:hover{background:var(--red);color:#fff}
+    .act:disabled{opacity:.4;cursor:not-allowed}
+
+    /* Modal */
+    .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:200;opacity:0;pointer-events:none;transition:.2s}
+    .modal-bg.show{opacity:1;pointer-events:all}
+    .modal{background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:0;max-width:700px;width:95%;max-height:90vh;overflow:hidden;display:flex;flex-direction:column}
+    .modal-hdr{padding:16px 20px;border-bottom:1px solid var(--border);font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:space-between}
+    .modal-hdr .close{cursor:pointer;color:var(--txt3);font-size:20px;padding:4px;border-radius:6px}
+    .modal-hdr .close:hover{color:var(--red);background:rgba(255,74,110,.1)}
+    .modal-body{padding:20px;overflow-y:auto;flex:1}
+    .modal-foot{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+    .btn{padding:8px 18px;border:none;border-radius:8px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:.15s}
+    .btn-accent{background:var(--accent);color:#fff;box-shadow:0 2px 10px var(--accentG)}
+    .btn-accent:hover{opacity:.85}
+    .btn-ghost{background:var(--bg4);color:var(--txt2);border:1px solid var(--border)}
+    .btn-ghost:hover{color:var(--txt);background:var(--border)}
+    .btn-green{background:var(--green);color:#000}
+    .btn-red{background:var(--red);color:#fff}
+
+    /* Preview video */
+    .preview-video{width:100%;max-height:60vh;border-radius:8px;background:#000;margin-bottom:12px}
+
+    /* Tags display */
+    .tags-area{margin-top:12px}
+    .tag-chip{display:inline-block;padding:4px 10px;background:var(--bg4);border:1px solid var(--border);border-radius:14px;font-size:11px;color:var(--blue);margin:2px 4px 2px 0}
+    .caption-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:12px;line-height:1.6;color:var(--txt);margin:8px 0;white-space:pre-wrap}
+    textarea.caption-edit{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:12px;line-height:1.6;color:var(--txt);font-family:inherit;outline:none;resize:vertical;min-height:80px}
+    textarea.caption-edit:focus{border-color:var(--accent)}
+
+    /* Upload form */
+    .upload-field{margin-top:12px}
+    .upload-field label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--txt2);margin-bottom:5px}
+    .upload-field input{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--txt);font-family:inherit;font-size:12px;outline:none;transition:.2s}
+    .upload-field input:focus{border-color:var(--accent)}
+    .upload-field input.valid{border-color:var(--green)!important;box-shadow:0 0 0 2px rgba(74,255,160,.15)}
+    .upload-field input.invalid{border-color:var(--red)!important;box-shadow:0 0 0 2px rgba(255,74,110,.15)}
+    .link-hint{font-size:10px;margin-top:4px;min-height:16px;transition:.15s}
+    .link-hint.ok{color:var(--green)}
+    .link-hint.err{color:var(--red)}
+
+    /* Loading spinner */
+    .spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;display:inline-block;vertical-align:middle}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .toast{position:fixed;bottom:20px;right:20px;padding:12px 22px;border-radius:10px;font-size:13px;font-weight:600;z-index:999;transform:translateY(80px);opacity:0;transition:.3s}
+    .toast.show{transform:translateY(0);opacity:1}
+    .toast.ok{background:var(--green);color:#000}
+    .toast.err{background:var(--red);color:#fff}
+
+    .empty-state{text-align:center;padding:60px 20px;color:var(--txt3)}
+    .empty-state .icon{font-size:48px;display:block;margin-bottom:12px}
+  </style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-left">📊 Upload Manager</div>
+  <div class="hdr-right">
+    <div class="day-badge" id="dayBadge"><span class="icon" style="font-size:16px">calendar_today</span> Loading...</div>
+    <button class="btn btn-ghost" onclick="loadReels()"><span class="icon" style="font-size:16px">refresh</span> Refresh</button>
+  </div>
+</div>
+
+<div class="stats" id="statsBar">
+  <div class="stat-card"><div class="stat-icon tot"><span class="icon">movie</span></div><div><div class="stat-num" id="statTotal">-</div><div class="stat-label">Total Reels</div></div></div>
+  <div class="stat-card"><div class="stat-icon dl"><span class="icon">download</span></div><div><div class="stat-num" id="statDl">-</div><div class="stat-label">Downloaded</div></div></div>
+  <div class="stat-card"><div class="stat-icon ed"><span class="icon">movie_edit</span></div><div><div class="stat-num" id="statEd">-</div><div class="stat-label">Edited</div></div></div>
+  <div class="stat-card"><div class="stat-icon up"><span class="icon">cloud_upload</span></div><div><div class="stat-num" id="statUp">-</div><div class="stat-label">Uploaded</div></div></div>
+</div>
+
+<div class="filters">
+  <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+  <button class="filter-btn" onclick="setFilter('not-edited',this)">Not Edited</button>
+  <button class="filter-btn" onclick="setFilter('edited',this)">Edited</button>
+  <button class="filter-btn" onclick="setFilter('not-uploaded',this)">Not Uploaded</button>
+  <button class="filter-btn" onclick="setFilter('uploaded',this)">Uploaded</button>
+  <button class="filter-btn" onclick="setFilter('has-tags',this)">Has Tags</button>
+  <input type="text" class="search-box" placeholder="🔍 Search movie name..." oninput="searchReels(this.value)" id="searchBox"/>
+</div>
+
+<div class="grid" id="reelGrid"></div>
+
+<!-- Detail/Action Modal -->
+<div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal">
+    <div class="modal-hdr"><span id="modalTitle">Reel</span><span class="close icon" onclick="closeModal()">close</span></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot" id="modalFoot"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let allReels = [];
+let currentFilter = 'all';
+let searchQuery = '';
+
+// ── Load Data ──
+async function loadReels() {
+  try {
+    const [reelRes, dayRes] = await Promise.all([
+      fetch('/api/reels').then(r => r.json()),
+      fetch('/api/day-info').then(r => r.json()),
+    ]);
+
+    allReels = reelRes.reels || [];
+    const s = reelRes.stats;
+
+    document.getElementById('statTotal').textContent = s.total;
+    document.getElementById('statDl').textContent = s.downloaded;
+    document.getElementById('statEd').textContent = s.edited;
+    document.getElementById('statUp').textContent = s.uploaded;
+    document.getElementById('dayBadge').innerHTML = `<span class="icon" style="font-size:16px">calendar_today</span> Next: Day ${dayRes.dayNumber} (${dayRes.todayPostCount} posted today)`;
+
+    renderGrid();
+  } catch(err) {
+    toast('Failed to load data','err');
+  }
+}
+
+// ── Render Grid ──
+function renderGrid() {
+  const grid = document.getElementById('reelGrid');
+  let filtered = [...allReels];
+
+  if (currentFilter === 'edited') filtered = filtered.filter(r => r.edited);
+  else if (currentFilter === 'not-edited') filtered = filtered.filter(r => !r.edited);
+  else if (currentFilter === 'uploaded') filtered = filtered.filter(r => r.uploaded);
+  else if (currentFilter === 'not-uploaded') filtered = filtered.filter(r => !r.uploaded);
+  else if (currentFilter === 'has-tags') filtered = filtered.filter(r => r.has_tags);
+
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    filtered = filtered.filter(r => (r.movie_name||'').toLowerCase().includes(q) || r.label.toLowerCase().includes(q));
+  }
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><span class="icon">search_off</span>No reels found</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(r => `
+    <div class="card" data-num="${r.reel_number}">
+      <div class="card-top">
+        <span class="card-num">#${String(r.reel_number).padStart(2,'0')}</span>
+        <span class="card-movie">${r.movie_name || 'Unknown Movie'}</span>
+        <div class="card-badges">
+          ${r.downloaded ? '<span class="badge badge-dl">DL</span>' : ''}
+          ${r.edited ? '<span class="badge badge-ed">Edited</span>' : '<span class="badge badge-no">Not Edited</span>'}
+          ${r.uploaded ? '<span class="badge badge-up">Uploaded</span>' : ''}
+          ${r.has_tags ? '<span class="badge badge-tags">Tags</span>' : ''}
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-desc">${r.description || 'No description'}</div>
+        <div class="card-meta">
+          ${r.duration ? `<span><span class="icon">schedule</span>${Math.round(r.duration)}s</span>` : ''}
+          ${r.likes ? `<span><span class="icon">favorite</span>${formatNum(r.likes)}</span>` : ''}
+          ${r.day_label ? `<span><span class="icon">calendar_today</span>${r.day_label}</span>` : ''}
+        </div>
+        <div class="card-actions">
+          <button class="act act-edit" onclick="editReel(${r.reel_number})" ${r.edited?'disabled':''}><span class="icon">movie_edit</span>${r.edited?'Edited':'Edit'}</button>
+          ${r.edited ? `<button class="act act-preview" onclick="previewReel(${r.reel_number})"><span class="icon">play_circle</span>Preview</button>` : ''}
+          ${r.edited ? `<button class="act act-delete" onclick="deleteEdit(${r.reel_number})"><span class="icon">delete</span>Re-edit</button>` : ''}
+          <button class="act act-tags" onclick="generateTags(${r.reel_number})"><span class="icon">auto_awesome</span>AI Tags</button>
+          ${r.edited && !r.uploaded ? `<button class="act act-upload" onclick="showUploadModal(${r.reel_number})"><span class="icon">cloud_upload</span>Upload</button>` : ''}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function setFilter(f, el) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderGrid();
+}
+
+function searchReels(q) {
+  searchQuery = q;
+  renderGrid();
+}
+
+// ── Actions ──
+async function editReel(num) {
+  // Show progress modal
+  document.getElementById('modalTitle').textContent = `Editing Reel ${String(num).padStart(2,'0')}`;
+  document.getElementById('modalBody').innerHTML = `
+    <div style="text-align:center;padding:40px">
+      <span class="spinner" style="width:32px;height:32px;border-width:3px"></span>
+      <div style="margin-top:16px;font-size:14px;font-weight:600" id="editStatus">🎬 Starting FFmpeg edit...</div>
+      <div style="margin-top:8px;font-size:11px;color:var(--txt3)">This may take 1-3 minutes depending on video size</div>
+    </div>`;
+  document.getElementById('modalFoot').innerHTML = '';
+  openModal();
+
+  try {
+    const r = await fetch(`/api/edit/${num}`, { method: 'POST' });
+    const j = await r.json();
+
+    if (j.success) {
+      const sizeMB = j.fileSize ? (j.fileSize/1024/1024).toFixed(1) + 'MB' : '';
+      document.getElementById('modalBody').innerHTML = `
+        <div style="text-align:center;padding:30px">
+          <span class="icon" style="font-size:48px;color:var(--green)">check_circle</span>
+          <div style="margin-top:12px;font-size:16px;font-weight:700;color:var(--green)">Edit Complete!</div>
+          <div style="margin-top:8px;font-size:12px;color:var(--txt2)">Reel ${String(num).padStart(2,'0')} edited successfully ${sizeMB ? '('+sizeMB+')' : ''}</div>
+        </div>`;
+      document.getElementById('modalFoot').innerHTML = `
+        <button class="btn btn-ghost" onclick="closeModal()">Close</button>
+        <button class="btn btn-accent" onclick="closeModal();previewReel(${num})"><span class="icon" style="font-size:14px">play_circle</span> Preview</button>`;
+      toast(`✅ Reel ${String(num).padStart(2,'0')} edited!`, 'ok');
+      loadReels();
+    } else {
+      document.getElementById('modalBody').innerHTML = `
+        <div style="padding:10px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+            <span class="icon" style="font-size:28px;color:var(--red)">error</span>
+            <span style="font-weight:700;font-size:14px;color:var(--red)">Edit Failed</span>
+          </div>
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:11px;color:var(--txt2);white-space:pre-wrap;max-height:300px;overflow:auto;font-family:monospace">${(j.error||'Unknown error').replace(/</g,'&lt;')}</div>
+        </div>`;
+      document.getElementById('modalFoot').innerHTML = `<button class="btn btn-ghost" onclick="closeModal()">Close</button>`;
+    }
+  } catch(err) {
+    document.getElementById('modalBody').innerHTML = `
+      <div style="padding:10px">
+        <span class="icon" style="font-size:28px;color:var(--red)">wifi_off</span>
+        <div style="margin-top:8px;font-weight:700;color:var(--red)">Connection Error</div>
+        <div style="margin-top:8px;color:var(--txt2);font-size:12px">${err.message}<br><br>The server may have crashed. Check the terminal.</div>
+      </div>`;
+    document.getElementById('modalFoot').innerHTML = `<button class="btn btn-ghost" onclick="closeModal()">Close</button>`;
+  }
+}
+
+async function deleteEdit(num) {
+  if (!confirm(`Delete edited video for Reel ${num} and re-edit?`)) return;
+  try {
+    await fetch(`/api/delete-edit/${num}`, { method: 'DELETE' });
+    toast('Deleted! Click Edit to re-process.', 'ok');
+    loadReels();
+  } catch(err) { toast('Delete failed', 'err'); }
+}
+
+function previewReel(num) {
+  document.getElementById('modalTitle').textContent = `Preview — Reel ${String(num).padStart(2,'0')}`;
+  document.getElementById('modalBody').innerHTML = `
+    <video class="preview-video" controls autoplay>
+      <source src="/api/preview/${num}/edited" type="video/mp4"/>
+    </video>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn btn-ghost" onclick="document.querySelector('.preview-video').src='/api/preview/${num}/original'"><span class="icon" style="font-size:14px">compare</span> View Original</button>
+      <button class="btn btn-ghost" onclick="document.querySelector('.preview-video').src='/api/preview/${num}/edited'"><span class="icon" style="font-size:14px">auto_fix_high</span> View Edited</button>
+    </div>
+  `;
+  document.getElementById('modalFoot').innerHTML = `<button class="btn btn-ghost" onclick="closeModal()">Close</button>`;
+  openModal();
+}
+
+async function generateTags(num) {
+  document.getElementById('modalTitle').textContent = `AI Tags — Reel ${String(num).padStart(2,'0')}`;
+  document.getElementById('modalBody').innerHTML = '<div style="text-align:center;padding:30px"><span class="spinner"></span><br><br>Generating AI caption & tags...</div>';
+  document.getElementById('modalFoot').innerHTML = '';
+  openModal();
+
+  try {
+    const r = await fetch(`/api/generate-tags/${num}`, { method: 'POST' });
+    const j = await r.json();
+    if (j.success || j.caption) {
+      showTagsResult(num, j);
+      loadReels();
+    } else {
+      document.getElementById('modalBody').innerHTML = `<div style="color:var(--red)">❌ ${j.error || 'Failed to generate tags'}</div>
+        <p style="margin-top:12px;color:var(--txt2);font-size:11px">Make sure NVIDIA_API_KEY is set in your .env file</p>`;
+      document.getElementById('modalFoot').innerHTML = `<button class="btn btn-ghost" onclick="closeModal()">Close</button>`;
+    }
+  } catch(err) {
+    document.getElementById('modalBody').innerHTML = `<div style="color:var(--red)">❌ Network error: ${err.message}</div>`;
+    document.getElementById('modalFoot').innerHTML = `<button class="btn btn-ghost" onclick="closeModal()">Close</button>`;
+  }
+}
+
+function showTagsResult(num, data) {
+  document.getElementById('modalBody').innerHTML = `
+    <h4 style="font-size:12px;color:var(--txt2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">📝 AI Caption</h4>
+    <div class="caption-box">${data.caption || 'No caption generated'}</div>
+
+    <h4 style="font-size:12px;color:var(--txt2);text-transform:uppercase;letter-spacing:.8px;margin:16px 0 8px">🏷️ Hashtags (${(data.hashtags||[]).length})</h4>
+    <div class="tags-area">${(data.hashtags||[]).map(t => `<span class="tag-chip">${t}</span>`).join('')}</div>
+
+    <h4 style="font-size:12px;color:var(--txt2);text-transform:uppercase;letter-spacing:.8px;margin:16px 0 8px">📋 Copy-Ready Caption</h4>
+    <textarea class="caption-edit" id="copyCaption">${data.caption || ''}\n\n${(data.hashtags||[]).join(' ')}</textarea>
+  `;
+  document.getElementById('modalFoot').innerHTML = `
+    <button class="btn btn-ghost" onclick="closeModal()">Close</button>
+    <button class="btn btn-accent" onclick="navigator.clipboard.writeText(document.getElementById('copyCaption').value);toast('Copied!','ok')"><span class="icon" style="font-size:14px">content_copy</span> Copy All</button>
+  `;
+}
+
+function showUploadModal(num) {
+  const reel = allReels.find(r => r.reel_number === num);
+  document.getElementById('modalTitle').textContent = `Upload — Reel ${String(num).padStart(2,'0')}`;
+  document.getElementById('modalBody').innerHTML = `
+    <div style="background:linear-gradient(135deg,var(--accent),#a855f7);padding:14px 18px;border-radius:10px;margin-bottom:16px;display:flex;align-items:center;gap:10px">
+      <span class="icon" style="font-size:24px">calendar_today</span>
+      <div><div style="font-weight:700;font-size:16px">Next post will be: Day <span id="uploadDay">...</span></div>
+      <div style="font-size:11px;opacity:.8">This day number will be burned into the video</div></div>
+    </div>
+
+    ${reel.has_tags ? `<div style="margin-bottom:16px"><h4 style="font-size:11px;color:var(--txt2);text-transform:uppercase;margin-bottom:6px">Caption Preview</h4>
+      <div class="caption-box" style="max-height:100px;overflow:auto">${reel.ai_caption||''}</div></div>` : ''}
+
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px">
+      <h4 style="font-size:12px;font-weight:700;margin-bottom:12px">📋 Upload Steps</h4>
+      <ol style="font-size:12px;color:var(--txt2);line-height:2;padding-left:18px">
+        <li>Open Instagram on your phone</li>
+        <li>Upload the <b>edited video</b> from <code>output/Edited/Reel ${String(num).padStart(2,'0')}/</code></li>
+        <li>Copy the AI-generated caption (use AI Tags button)</li>
+        <li>Post the reel</li>
+        <li>Copy the reel's Instagram link</li>
+        <li>Paste it below and click "Mark as Uploaded"</li>
+      </ol>
+    </div>
+
+    <div class="upload-field">
+      <label>Instagram Reel Link <span style="color:var(--red);font-size:12px">*</span> (REQUIRED)</label>
+      <input type="text" id="uploadLink" placeholder="https://www.instagram.com/reel/..." oninput="validateUploadLink()" />
+      <div class="link-hint" id="linkHint">⬆️ Post the reel first, then paste the link here</div>
+    </div>
+  `;
+  document.getElementById('modalFoot').innerHTML = `
+    <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-green" id="markUploadBtn" onclick="markUploaded(${num})" disabled style="opacity:.5;cursor:not-allowed"><span class="icon" style="font-size:14px">cloud_done</span> Mark as Uploaded</button>
+  `;
+  openModal();
+
+  // Fetch day info
+  fetch('/api/day-info').then(r=>r.json()).then(d => {
+    document.getElementById('uploadDay').textContent = d.dayNumber;
+  });
+}
+
+/** Real-time Instagram link validation */
+function validateUploadLink() {
+  const input = document.getElementById('uploadLink');
+  const hint = document.getElementById('linkHint');
+  const btn = document.getElementById('markUploadBtn');
+  const val = input.value.trim();
+
+  if (!val) {
+    input.className = '';
+    hint.className = 'link-hint';
+    hint.textContent = '⬆️ Post the reel first, then paste the link here';
+    btn.disabled = true;
+    btn.style.opacity = '.5';
+    btn.style.cursor = 'not-allowed';
+    return;
+  }
+
+  const isValid = /^https?:\/\/(www\.)?instagram\.com\/(reel|reels|p)\/[A-Za-z0-9_-]+/i.test(val);
+
+  if (isValid) {
+    input.className = 'valid';
+    hint.className = 'link-hint ok';
+    hint.textContent = '✅ Valid Instagram link';
+    btn.disabled = false;
+    btn.style.opacity = '1';
+    btn.style.cursor = 'pointer';
+  } else {
+    input.className = 'invalid';
+    hint.className = 'link-hint err';
+    hint.textContent = '❌ Invalid — Use format: https://www.instagram.com/reel/...';
+    btn.disabled = true;
+    btn.style.opacity = '.5';
+    btn.style.cursor = 'not-allowed';
+  }
+}
+
+async function markUploaded(num) {
+  const link = document.getElementById('uploadLink').value.trim();
+
+  // Double-check validation (in case button somehow enabled)
+  if (!link) {
+    toast('❌ Instagram link is required! Post the reel first.', 'err');
+    return;
+  }
+  if (!/^https?:\/\/(www\.)?instagram\.com\/(reel|reels|p)\/[A-Za-z0-9_-]+/i.test(link)) {
+    toast('❌ Invalid Instagram URL!', 'err');
+    return;
+  }
+
+  const btn = document.getElementById('markUploadBtn');
+  btn.innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:2px;display:inline-block"></span> Uploading...';
+  btn.disabled = true;
+
+  try {
+    const r = await fetch('/api/mark-uploaded', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reel_number: num, upload_link: link }),
+    });
+    const j = await r.json();
+    if (j.success) {
+      toast(`✅ Reel ${num} marked as uploaded! ${j.day_label}`, 'ok');
+      closeModal();
+      loadReels();
+    } else {
+      toast(j.error || 'Failed', 'err');
+      btn.innerHTML = '<span class="icon" style="font-size:14px">cloud_done</span> Mark as Uploaded';
+      btn.disabled = false;
+    }
+  } catch(err) {
+    toast('Error: ' + err.message, 'err');
+    btn.innerHTML = '<span class="icon" style="font-size:14px">cloud_done</span> Mark as Uploaded';
+    btn.disabled = false;
+  }
+}
+
+// ── Modal ──
+function openModal() { document.getElementById('modalBg').classList.add('show'); }
+function closeModal() {
+  document.getElementById('modalBg').classList.remove('show');
+  // Stop any playing video
+  const v = document.querySelector('.preview-video');
+  if (v) v.pause();
+}
+
+// ── Helpers ──
+function formatNum(n) {
+  if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n/1000).toFixed(1) + 'K';
+  return n;
+}
+
+function toast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── Init ──
+loadReels();
+</script>
+</body>
+</html>

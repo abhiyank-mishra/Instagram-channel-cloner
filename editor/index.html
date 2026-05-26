@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reel Template Editor — Pro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@400;600;700;800;900&family=Bebas+Neue&family=Oswald:wght@400;500;600;700&family=Montserrat:wght@400;600;700;800;900&family=Roboto+Condensed:wght@400;700&family=Bangers&family=Permanent+Marker&family=Righteous&family=Anton&family=Playfair+Display:wght@700;900&family=Raleway:wght@400;700;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-primary: #08080d;
+      --bg-secondary: #0f0f18;
+      --bg-panel: #16162a;
+      --bg-card: #1e1e38;
+      --bg-hover: #26264a;
+      --accent: #7c5cfc;
+      --accent-glow: rgba(124,92,252,0.25);
+      --accent-hover: #9b7fff;
+      --text: #eeeef4;
+      --text2: #8888a8;
+      --text3: #55556a;
+      --border: #28284a;
+      --red: #ff4a6e;
+      --green: #4affa0;
+      --yellow: #ffcc4a;
+      --blue: #4ac4ff;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',sans-serif; background:var(--bg-primary); color:var(--text); overflow:hidden; height:100vh; font-size:13px; }
+    .icon { font-family:'Material Symbols Rounded'; font-size:20px; vertical-align:middle; }
+
+    /* ── HEADER ── */
+    .header { display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:50px; background:var(--bg-secondary); border-bottom:1px solid var(--border); }
+    .header-left { display:flex; align-items:center; gap:10px; font-weight:700; font-size:15px; }
+    .header-left .logo { font-size:22px; }
+    .header-right { display:flex; gap:8px; }
+    .btn { padding:7px 16px; border:none; border-radius:7px; font-family:inherit; font-size:12px; font-weight:600; cursor:pointer; transition:all .15s; display:flex; align-items:center; gap:5px; }
+    .btn-ghost { background:transparent; color:var(--text2); border:1px solid var(--border); }
+    .btn-ghost:hover { background:var(--bg-card); color:var(--text); }
+    .btn-accent { background:var(--accent); color:#fff; box-shadow:0 2px 10px var(--accent-glow); }
+    .btn-accent:hover { background:var(--accent-hover); transform:translateY(-1px); }
+    .btn-green { background:var(--green); color:#000; }
+    .btn-red { background:var(--red); color:#fff; }
+
+    /* ── MAIN LAYOUT ── */
+    .main { display:flex; height:calc(100vh - 50px); }
+
+    /* ── LEFT PANEL: Properties ── */
+    .panel-left { width:340px; min-width:340px; background:var(--bg-secondary); border-right:1px solid var(--border); overflow-y:auto; }
+    .panel-left::-webkit-scrollbar { width:4px; }
+    .panel-left::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+
+    .props-header { padding:14px 16px; background:var(--bg-panel); border-bottom:1px solid var(--border); font-weight:700; font-size:13px; display:flex; align-items:center; gap:8px; }
+    .props-body { padding:14px 16px; }
+    .props-empty { padding:40px 20px; text-align:center; color:var(--text3); }
+    .props-empty .icon { font-size:40px; display:block; margin-bottom:12px; color:var(--text3); }
+
+    .field { margin-bottom:14px; }
+    .field label { display:block; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:var(--text2); margin-bottom:5px; }
+    .field input[type="text"], .field input[type="number"], .field select, .field textarea {
+      width:100%; padding:7px 10px; border:1px solid var(--border); border-radius:7px; background:var(--bg-primary); color:var(--text);
+      font-family:inherit; font-size:12px; outline:none; transition:border .15s;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color:var(--accent); box-shadow:0 0 0 2px var(--accent-glow); }
+    .field textarea { resize:vertical; min-height:50px; }
+    .field-row { display:flex; gap:8px; }
+    .field-row .field { flex:1; }
+    .color-wrap { display:flex; gap:6px; align-items:center; }
+    .color-wrap input[type="color"] { width:32px; height:32px; border:2px solid var(--border); border-radius:6px; padding:1px; cursor:pointer; background:none; }
+    .color-wrap input[type="text"] { flex:1; }
+    .range-row { display:flex; align-items:center; gap:6px; }
+    .range-row input[type="range"] { flex:1; accent-color:var(--accent); height:3px; }
+    .range-row .val { font-size:11px; color:var(--accent); font-weight:700; min-width:32px; text-align:right; }
+    .toggle-wrap { display:flex; align-items:center; justify-content:space-between; }
+    .toggle-wrap label { text-transform:none; letter-spacing:0; font-size:12px; font-weight:500; color:var(--text); }
+    .sw { width:36px; height:20px; background:var(--border); border-radius:10px; cursor:pointer; position:relative; transition:.2s; flex-shrink:0; }
+    .sw.on { background:var(--accent); }
+    .sw::after { content:''; width:14px; height:14px; background:#fff; border-radius:50%; position:absolute; top:3px; left:3px; transition:.2s; }
+    .sw.on::after { left:19px; }
+    .sep { height:1px; background:var(--border); margin:16px 0; }
+    .badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; }
+    .badge-dynamic { background:rgba(74,255,160,.15); color:var(--green); }
+    .badge-static { background:rgba(136,136,168,.15); color:var(--text2); }
+
+    /* ── CENTER: Canvas ── */
+    .canvas-area { flex:1; display:flex; align-items:center; justify-content:center; background:var(--bg-primary); position:relative; overflow:hidden;
+      background-image:radial-gradient(circle,rgba(40,40,74,.4) 1px,transparent 1px); background-size:20px 20px; }
+    .canvas-wrap { position:relative; box-shadow:0 20px 80px rgba(0,0,0,.7); border-radius:4px; overflow:hidden; }
+    .canvas-wrap img#bg { display:block; height:72vh; width:auto; pointer-events:none; }
+    .el { position:absolute; cursor:move; user-select:none; }
+    .el:hover { outline:2px solid var(--accent); outline-offset:1px; }
+    .el.sel { outline:2px solid var(--accent); outline-offset:1px; box-shadow:0 0 16px var(--accent-glow); }
+    .el .resize { position:absolute; width:10px; height:10px; background:var(--accent); border-radius:2px; display:none; }
+    .el.sel .resize { display:block; }
+    .el .resize.br { bottom:-5px; right:-5px; cursor:nwse-resize; }
+    .el .resize.bm { bottom:-5px; left:50%; transform:translateX(-50%); cursor:ns-resize; }
+
+    /* ── RIGHT PANEL: Layers ── */
+    .panel-right { width:260px; min-width:260px; background:var(--bg-secondary); border-left:1px solid var(--border); display:flex; flex-direction:column; }
+    .layers-header { padding:12px 14px; background:var(--bg-panel); border-bottom:1px solid var(--border); font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:space-between; }
+    .layers-body { flex:1; overflow-y:auto; padding:8px; }
+    .layers-body::-webkit-scrollbar { width:4px; }
+    .layers-body::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+    .add-menu { position:relative; }
+    .add-dropdown { position:absolute; top:100%; right:0; background:var(--bg-panel); border:1px solid var(--border); border-radius:10px; padding:6px; min-width:180px; z-index:100; display:none; box-shadow:0 8px 30px rgba(0,0,0,.5); }
+    .add-dropdown.show { display:block; }
+    .add-dropdown .add-item { padding:8px 12px; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:8px; font-size:12px; transition:.1s; }
+    .add-dropdown .add-item:hover { background:var(--bg-hover); }
+    .add-dropdown .add-item .icon { font-size:18px; color:var(--accent); }
+
+    .layer { display:flex; align-items:center; gap:8px; padding:8px 10px; background:var(--bg-card); border:1px solid transparent; border-radius:8px; margin-bottom:5px; cursor:pointer; transition:.15s; }
+    .layer:hover { border-color:var(--border); }
+    .layer.sel { border-color:var(--accent); background:rgba(124,92,252,.08); }
+    .layer .l-icon { font-size:16px; width:28px; height:28px; display:flex; align-items:center; justify-content:center; border-radius:6px; background:var(--bg-hover); flex-shrink:0; }
+    .layer .l-info { flex:1; min-width:0; }
+    .layer .l-name { font-size:12px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .layer .l-type { font-size:9px; color:var(--text3); text-transform:uppercase; letter-spacing:.5px; }
+    .layer .l-vis { cursor:pointer; color:var(--text3); font-size:16px; padding:2px; border-radius:4px; }
+    .layer .l-vis:hover { color:var(--text); background:var(--bg-hover); }
+    .layer .l-del { cursor:pointer; color:var(--text3); font-size:16px; padding:2px; border-radius:4px; }
+    .layer .l-del:hover { color:var(--red); background:rgba(255,74,110,.1); }
+
+    /* ── TOAST ── */
+    .toast { position:fixed; bottom:20px; right:20px; padding:12px 22px; border-radius:10px; font-size:13px; font-weight:600; z-index:9999; transform:translateY(80px); opacity:0; transition:.3s; }
+    .toast.show { transform:translateY(0); opacity:1; }
+    .toast.ok { background:var(--green); color:#000; }
+    .toast.err { background:var(--red); color:#fff; }
+
+    /* ── MODAL ── */
+    .modal-bg { position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(3px); display:flex; align-items:center; justify-content:center; z-index:500; opacity:0; pointer-events:none; transition:.2s; }
+    .modal-bg.show { opacity:1; pointer-events:all; }
+    .modal-box { background:var(--bg-panel); border:1px solid var(--border); border-radius:14px; padding:24px; max-width:700px; width:95%; max-height:90vh; overflow-y:auto; }
+    .modal-box h3 { font-size:16px; margin-bottom:14px; }
+    .modal-box pre { background:var(--bg-primary); border:1px solid var(--border); border-radius:8px; padding:14px; font-size:10px; color:var(--green); overflow:auto; max-height:none; }
+    .modal-actions { display:flex; gap:8px; margin-top:14px; justify-content:flex-end; }
+    .spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left"><span class="logo">🎬</span> Reel Template Editor <span style="font-size:10px;color:var(--text3);font-weight:400;">PRO</span></div>
+  <div class="header-right">
+    <button class="btn btn-ghost" onclick="resetAll()"><span class="icon">restart_alt</span> Reset</button>
+    <button class="btn btn-ghost" onclick="showJSON()"><span class="icon">data_object</span> JSON</button>
+    <button class="btn btn-ghost" id="testRenderBtn" onclick="testRender()" style="color:var(--yellow);border-color:var(--yellow);"><span class="icon">preview</span> Test Render</button>
+    <button class="btn btn-accent" onclick="saveTemplate()"><span class="icon">save</span> Save Template</button>
+  </div>
+</div>
+
+<div class="main">
+  <!-- LEFT: Properties -->
+  <div class="panel-left" id="propsPanel">
+    <div class="props-header" id="propsTitle"><span class="icon">tune</span> Properties</div>
+    <div class="props-body" id="propsBody">
+      <div class="props-empty"><span class="icon">touch_app</span>Select a layer to edit its properties<br><br>Or click <b>+ Add</b> to create a new layer</div>
+    </div>
+  </div>
+
+  <!-- CENTER: Canvas -->
+  <div class="canvas-area" id="canvasArea" onclick="deselectAll(event)">
+    <div class="canvas-wrap" id="canvasWrap">
+      <img id="bg" src="preview_frame.jpg" onload="initCanvas()" />
+    </div>
+  </div>
+
+  <!-- RIGHT: Layers -->
+  <div class="panel-right">
+    <div class="layers-header">
+      <span><span class="icon" style="font-size:16px;">layers</span> Layers</span>
+      <div class="add-menu">
+        <button class="btn btn-accent" style="padding:5px 12px;" onclick="toggleAddMenu()"><span class="icon" style="font-size:16px;">add</span> Add</button>
+        <div class="add-dropdown" id="addMenu">
+          <div class="add-item" onclick="addLayer('bar')"><span class="icon">remove</span> Bar / Strip</div>
+          <div class="add-item" onclick="addLayer('text')"><span class="icon">title</span> Text Label</div>
+          <div class="add-item" onclick="addLayer('blur')"><span class="icon">blur_on</span> Blur Region</div>
+          <div class="add-item" onclick="addLayer('logo')"><span class="icon">image</span> Logo / Image</div>
+        </div>
+      </div>
+    </div>
+    <div class="layers-body" id="layersList"></div>
+  </div>
+</div>
+
+<!-- JSON Modal -->
+<div class="modal-bg" id="jsonModal">
+  <div class="modal-box">
+    <h3><span class="icon">data_object</span> Template Config</h3>
+    <pre id="jsonPre"></pre>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="document.getElementById('jsonModal').classList.remove('show')">Close</button>
+      <button class="btn btn-accent" onclick="navigator.clipboard.writeText(document.getElementById('jsonPre').textContent);toast('Copied!','ok')"><span class="icon">content_copy</span> Copy</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════ STATE ═══════════════
+let scale = 1;
+const VW = 1080, VH = 1920;
+let layers = [];
+let selectedId = null;
+let nextId = 1;
+let dragState = null;
+
+const FONTS = [
+  { label:'Poppins', value:'Poppins, sans-serif' },
+  { label:'Bebas Neue', value:'Bebas Neue, sans-serif' },
+  { label:'Oswald', value:'Oswald, sans-serif' },
+  { label:'Montserrat', value:'Montserrat, sans-serif' },
+  { label:'Anton', value:'Anton, sans-serif' },
+  { label:'Bangers', value:'Bangers, cursive' },
+  { label:'Permanent Marker', value:'Permanent Marker, cursive' },
+  { label:'Righteous', value:'Righteous, sans-serif' },
+  { label:'Playfair Display', value:'Playfair Display, serif' },
+  { label:'Raleway', value:'Raleway, sans-serif' },
+  { label:'Roboto Condensed', value:'Roboto Condensed, sans-serif' },
+  { label:'Inter', value:'Inter, sans-serif' },
+];
+
+// ═══════════════ INIT ═══════════════
+function initCanvas() {
+  const img = document.getElementById('bg');
+  scale = img.clientWidth / VW;
+  renderAll();
+}
+window.addEventListener('resize', initCanvas);
+
+// ═══════════════ LAYER MANAGEMENT ═══════════════
+function addLayer(type) {
+  const id = nextId++;
+  let layer;
+  switch(type) {
+    case 'bar':
+      layer = { id, type:'bar', name:`Bar ${id}`, visible:true, color:'#000000', opacity:0.85, x:0, y:0, w:VW, h:120 };
+      break;
+    case 'text':
+      layer = { id, type:'text', name:`Text ${id}`, visible:true, content:'Movie Title', isDynamic:true, dynamicSource:'auto',
+        font:'Poppins, sans-serif', size:36, weight:700, color:'#ffffff', shadowPx:3, x:40, y:40, letterSpacing:0 };
+      break;
+    case 'blur':
+      layer = { id, type:'blur', name:`Blur ${id}`, visible:true, x:100, y:100, w:300, h:200, blurAmount:15 };
+      break;
+    case 'logo':
+      layer = { id, type:'logo', name:`Logo ${id}`, visible:true, x:VW-120, y:VH-120, w:80, h:80, opacity:1, file:null, dataUrl:null };
+      break;
+  }
+  layers.push(layer);
+  closeAddMenu();
+  selectLayer(id);
+  renderAll();
+}
+
+function deleteLayer(id) {
+  layers = layers.filter(l => l.id !== id);
+  if (selectedId === id) { selectedId = null; renderProps(); }
+  renderAll();
+}
+
+function toggleVisibility(id) {
+  const l = layers.find(x => x.id === id);
+  if (l) { l.visible = !l.visible; renderAll(); }
+}
+
+function selectLayer(id) {
+  selectedId = id;
+  renderLayers();
+  renderProps();
+  document.querySelectorAll('.el').forEach(e => e.classList.toggle('sel', e.dataset.id == id));
+}
+
+function deselectAll(e) {
+  if (e.target.id === 'canvasArea') { selectedId = null; renderLayers(); renderProps(); document.querySelectorAll('.el').forEach(e => e.classList.remove('sel')); }
+}
+
+// ═══════════════ RENDER ═══════════════
+function renderAll() {
+  renderCanvas();
+  renderLayers();
+  renderProps();
+}
+
+function renderCanvas() {
+  // Remove old elements
+  document.querySelectorAll('.el').forEach(e => e.remove());
+  const wrap = document.getElementById('canvasWrap');
+
+  layers.forEach(l => {
+    if (!l.visible) return;
+    const el = document.createElement('div');
+    el.className = 'el' + (l.id === selectedId ? ' sel' : '');
+    el.dataset.id = l.id;
+    el.onmousedown = (e) => { e.stopPropagation(); selectLayer(l.id); startDrag(e, l); };
+
+    const sx = v => v * scale;
+
+    if (l.type === 'bar') {
+      el.style.cssText = `left:0; top:${sx(l.y)}px; width:100%; height:${sx(l.h)}px; background:${hexRgba(l.color, l.opacity)};`;
+      // Resize handle bottom
+      const rh = document.createElement('div');
+      rh.className = 'resize bm';
+      rh.onmousedown = (e) => { e.stopPropagation(); startResize(e, l, 'h'); };
+      el.appendChild(rh);
+    }
+    else if (l.type === 'text') {
+      el.style.cssText = `left:${sx(l.x)}px; top:${sx(l.y)}px; font-family:${l.font}; font-size:${sx(l.size)}px; font-weight:${l.weight}; color:${l.color}; text-shadow:${l.shadowPx}px ${l.shadowPx}px ${l.shadowPx*2}px rgba(0,0,0,.8); white-space:nowrap; padding:2px 6px; letter-spacing:${l.letterSpacing}px;`;
+      el.textContent = l.content;
+    }
+    else if (l.type === 'blur') {
+      el.style.cssText = `left:${sx(l.x)}px; top:${sx(l.y)}px; width:${sx(l.w)}px; height:${sx(l.h)}px; backdrop-filter:blur(${l.blurAmount}px); -webkit-backdrop-filter:blur(${l.blurAmount}px); background:rgba(255,255,255,.05); border:1px dashed rgba(255,255,255,.2);`;
+      const rh = document.createElement('div');
+      rh.className = 'resize br';
+      rh.onmousedown = (e) => { e.stopPropagation(); startResize(e, l, 'wh'); };
+      el.appendChild(rh);
+    }
+    else if (l.type === 'logo') {
+      el.style.cssText = `left:${sx(l.x)}px; top:${sx(l.y)}px; width:${sx(l.w)}px; height:${sx(l.h)}px; opacity:${l.opacity};`;
+      if (l.dataUrl) {
+        const img = document.createElement('img');
+        img.src = l.dataUrl;
+        img.style.cssText = 'width:100%;height:100%;object-fit:contain;pointer-events:none;';
+        el.appendChild(img);
+      } else {
+        el.style.background = 'rgba(124,92,252,.15)';
+        el.style.border = '2px dashed var(--accent)';
+        el.style.display = 'flex';
+        el.style.alignItems = 'center';
+        el.style.justifyContent = 'center';
+        el.style.fontSize = '10px';
+        el.style.color = 'var(--accent)';
+        el.textContent = 'LOGO';
+      }
+      const rh = document.createElement('div');
+      rh.className = 'resize br';
+      rh.onmousedown = (e) => { e.stopPropagation(); startResize(e, l, 'wh'); };
+      el.appendChild(rh);
+    }
+
+    wrap.appendChild(el);
+  });
+}
+
+function renderLayers() {
+  const list = document.getElementById('layersList');
+  list.innerHTML = '';
+  // Render in reverse (top layer first)
+  [...layers].reverse().forEach(l => {
+    const div = document.createElement('div');
+    div.className = 'layer' + (l.id === selectedId ? ' sel' : '');
+    div.onclick = () => selectLayer(l.id);
+    const icons = { bar:'remove', text:'title', blur:'blur_on', logo:'image' };
+    const types = { bar:'Bar', text:'Text', blur:'Blur', logo:'Logo' };
+    div.innerHTML = `
+      <div class="l-icon"><span class="icon" style="font-size:14px;">${icons[l.type]}</span></div>
+      <div class="l-info"><div class="l-name">${l.name}</div><div class="l-type">${types[l.type]}${l.type==='text' ? (l.isDynamic?' · Dynamic':' · Static') : ''}</div></div>
+      <span class="l-vis icon" title="Toggle visibility" onclick="event.stopPropagation();toggleVisibility(${l.id})">${l.visible?'visibility':'visibility_off'}</span>
+      <span class="l-del icon" title="Delete" onclick="event.stopPropagation();deleteLayer(${l.id})">close</span>
+    `;
+    list.appendChild(div);
+  });
+}
+
+// ═══════════════ PROPERTIES PANEL ═══════════════
+function renderProps() {
+  const body = document.getElementById('propsBody');
+  const title = document.getElementById('propsTitle');
+  const l = layers.find(x => x.id === selectedId);
+  if (!l) {
+    title.innerHTML = '<span class="icon">tune</span> Properties';
+    body.innerHTML = '<div class="props-empty"><span class="icon">touch_app</span>Select a layer to edit properties</div>';
+    return;
+  }
+  const icons = { bar:'remove', text:'title', blur:'blur_on', logo:'image' };
+  title.innerHTML = `<span class="icon">${icons[l.type]}</span> ${l.name}`;
+
+  let html = '';
+
+  // Name field (all types)
+  html += field('Layer Name', `<input type="text" value="${esc(l.name)}" onchange="upd(${l.id},'name',this.value)" />`);
+
+  if (l.type === 'bar') {
+    html += field('Color', colorField(l.color, l.id, 'color'));
+    html += field('Height (px)', rangeField(l.h, 20, 600, l.id, 'h'));
+    html += field('Y Position (px)', rangeField(l.y, 0, VH, l.id, 'y'));
+    html += field('Opacity', rangeField(Math.round(l.opacity*100), 0, 100, l.id, 'opacity', v => v/100, '%'));
+  }
+  else if (l.type === 'text') {
+    // Dynamic toggle
+    html += `<div class="field"><div class="toggle-wrap"><label>Dynamic Text</label>
+      <div class="sw ${l.isDynamic?'on':''}" onclick="upd(${l.id},'isDynamic',!getLyr(${l.id}).isDynamic)"></div>
+    </div></div>`;
+
+    if (l.isDynamic) {
+      html += `<div class="field"><label>Dynamic Source</label><select onchange="upd(${l.id},'dynamicSource',this.value)">
+        <option value="auto" ${l.dynamicSource==='auto'?'selected':''}>Auto-extract movie name</option>
+        <option value="description_first_line" ${l.dynamicSource==='description_first_line'?'selected':''}>First line of description</option>
+        <option value="reel_label" ${l.dynamicSource==='reel_label'?'selected':''}>Reel label (Reel 01)</option>
+        <option value="day_counter" ${l.dynamicSource==='day_counter'?'selected':''}>📅 Day Counter (Day 01, 02...)</option>
+      </select></div>`;
+      if (l.dynamicSource === 'day_counter') {
+        html += field('Day Format', `<input type="text" value="${esc(l.dayFormat||'Day {day}')}" onchange="upd(${l.id},'dayFormat',this.value)" placeholder="Day {day} of finding good movies" />`);
+        html += `<div style="margin-bottom:12px;font-size:10px;color:var(--txt3)">Use <b>{day}</b> as placeholder for the day number (e.g., 01, 01.5, 02)</div>`;
+      }
+      html += `<div style="margin-bottom:12px;"><span class="badge badge-dynamic">⚡ Dynamic — changes per reel</span></div>`;
+    } else {
+      html += `<div style="margin-bottom:12px;"><span class="badge badge-static">📌 Static — same on all reels</span></div>`;
+    }
+
+    html += field('Preview Text', `<input type="text" value="${esc(l.content)}" onchange="upd(${l.id},'content',this.value)" />`);
+    html += field('Font Family', `<select onchange="upd(${l.id},'font',this.value)">${FONTS.map(f=>`<option value="${f.value}" ${l.font===f.value?'selected':''}>${f.label}</option>`).join('')}</select>`);
+    html += '<div class="field-row">';
+    html += field('Size', rangeField(l.size, 10, 120, l.id, 'size'));
+    html += field('Weight', `<select onchange="upd(${l.id},'weight',+this.value)">
+      ${[300,400,500,600,700,800,900].map(w=>`<option value="${w}" ${l.weight===w?'selected':''}>${w}</option>`).join('')}</select>`);
+    html += '</div>';
+    html += field('Text Color', colorField(l.color, l.id, 'color'));
+    html += field('Shadow', rangeField(l.shadowPx, 0, 20, l.id, 'shadowPx', null, 'px'));
+    html += field('Letter Spacing', rangeField(l.letterSpacing, -5, 15, l.id, 'letterSpacing', null, 'px'));
+  }
+  else if (l.type === 'blur') {
+    html += field('Blur Amount', rangeField(l.blurAmount, 1, 40, l.id, 'blurAmount', null, 'px'));
+    html += field('Width', rangeField(l.w, 50, VW, l.id, 'w'));
+    html += field('Height', rangeField(l.h, 50, VH, l.id, 'h'));
+  }
+  else if (l.type === 'logo') {
+    html += `<div class="field"><label>Upload Image</label>
+      <div style="border:2px dashed var(--border);border-radius:8px;padding:16px;text-align:center;cursor:pointer;position:relative;">
+        <span class="icon" style="font-size:24px;color:var(--text3);">upload_file</span>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px;">${l.file || 'Click to upload PNG'}</div>
+        <input type="file" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;" onchange="uploadLogo(event,${l.id})" />
+      </div></div>`;
+    html += field('Size', rangeField(l.w, 20, 400, l.id, 'w', v => { getLyr(l.id).h = v; return v; }));
+    html += field('Opacity', rangeField(Math.round(l.opacity*100), 10, 100, l.id, 'opacity', v => v/100, '%'));
+  }
+
+  // Position fields (all types)
+  html += '<div class="sep"></div>';
+  html += `<div class="field-row">`;
+  html += field('X', `<input type="number" value="${l.x}" onchange="upd(${l.id},'x',+this.value)" style="width:100%;" />`);
+  html += field('Y', `<input type="number" value="${l.y}" onchange="upd(${l.id},'y',+this.value)" style="width:100%;" />`);
+  html += `</div>`;
+  if (l.w !== undefined) {
+    html += `<div class="field-row">`;
+    html += field('W', `<input type="number" value="${l.w}" onchange="upd(${l.id},'w',+this.value)" style="width:100%;" />`);
+    html += field('H', `<input type="number" value="${l.h}" onchange="upd(${l.id},'h',+this.value)" style="width:100%;" />`);
+    html += `</div>`;
+  }
+
+  body.innerHTML = html;
+}
+
+// ═══════════════ HELPERS ═══════════════
+function field(label, inner) { return `<div class="field"><label>${label}</label>${inner}</div>`; }
+
+function colorField(val, id, prop) {
+  return `<div class="color-wrap"><input type="color" value="${val}" oninput="upd(${id},'${prop}',this.value);this.nextElementSibling.value=this.value" /><input type="text" value="${val}" oninput="upd(${id},'${prop}',this.value);this.previousElementSibling.value=this.value" /></div>`;
+}
+
+function rangeField(val, min, max, id, prop, transform, suffix) {
+  const tf = transform ? transform.toString() : 'null';
+  return `<div class="range-row"><input type="range" min="${min}" max="${max}" value="${val}" oninput="updRange(${id},'${prop}',+this.value,${tf});this.nextElementSibling.textContent=this.value+'${suffix||''}'" /><span class="val">${val}${suffix||''}</span></div>`;
+}
+
+function upd(id, prop, val) {
+  const l = layers.find(x => x.id === id);
+  if (l) { l[prop] = val; renderAll(); }
+}
+
+function updRange(id, prop, val, transform) {
+  const l = layers.find(x => x.id === id);
+  if (l) { l[prop] = transform ? transform(val) : val; renderCanvas(); }
+}
+
+function getLyr(id) { return layers.find(x => x.id === id); }
+function esc(s) { return String(s).replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
+
+function hexRgba(hex, a) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+function uploadLogo(e, id) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const l = getLyr(id);
+  l.file = file.name;
+  const reader = new FileReader();
+  reader.onload = ev => { l.dataUrl = ev.target.result; renderAll(); toast('Image loaded!','ok'); };
+  reader.readAsDataURL(file);
+}
+
+// ═══════════════ DRAG & RESIZE ═══════════════
+function startDrag(e, l) {
+  const el = document.querySelector(`.el[data-id="${l.id}"]`);
+  dragState = { type:'move', l, startX:e.clientX, startY:e.clientY, origX:l.x, origY:l.y };
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', stopMove);
+}
+
+function startResize(e, l, mode) {
+  e.preventDefault();
+  dragState = { type:'resize', l, mode, startX:e.clientX, startY:e.clientY, origW:l.w, origH:l.h };
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', stopMove);
+}
+
+function onMove(e) {
+  if (!dragState) return;
+  const dx = (e.clientX - dragState.startX) / scale;
+  const dy = (e.clientY - dragState.startY) / scale;
+  const l = dragState.l;
+
+  if (dragState.type === 'move') {
+    if (l.type === 'bar') {
+      l.y = Math.max(0, Math.round(dragState.origY + dy));
+    } else {
+      l.x = Math.round(dragState.origX + dx);
+      l.y = Math.round(dragState.origY + dy);
+    }
+  } else if (dragState.type === 'resize') {
+    if (dragState.mode === 'h') l.h = Math.max(20, Math.round(dragState.origH + dy));
+    if (dragState.mode === 'wh') { l.w = Math.max(20, Math.round(dragState.origW + dx)); l.h = Math.max(20, Math.round(dragState.origH + dy)); }
+  }
+  renderCanvas();
+}
+
+function stopMove() {
+  dragState = null;
+  document.removeEventListener('mousemove', onMove);
+  document.removeEventListener('mouseup', stopMove);
+  renderProps();
+}
+
+// ═══════════════ ADD MENU ═══════════════
+function toggleAddMenu() { document.getElementById('addMenu').classList.toggle('show'); }
+function closeAddMenu() { document.getElementById('addMenu').classList.remove('show'); }
+document.addEventListener('click', e => { if (!e.target.closest('.add-menu')) closeAddMenu(); });
+
+// ═══════════════ SAVE / JSON ═══════════════
+function buildConfig() {
+  return {
+    video: { width: VW, height: VH },
+    layers: layers.map(l => {
+      const base = { type:l.type, name:l.name, visible:l.visible, x:l.x, y:l.y };
+      if (l.type === 'bar') Object.assign(base, { w:l.w, h:l.h, color:l.color, opacity:l.opacity });
+      if (l.type === 'text') {
+        const textProps = { content:l.content, isDynamic:l.isDynamic, dynamicSource:l.dynamicSource||'auto',
+          font:l.font, size:l.size, weight:l.weight, color:l.color, shadowPx:l.shadowPx, letterSpacing:l.letterSpacing };
+        if (l.dynamicSource === 'day_counter') textProps.dayFormat = l.dayFormat || 'Day {day}';
+        Object.assign(base, textProps);
+      }
+      if (l.type === 'blur') Object.assign(base, { w:l.w, h:l.h, blurAmount:l.blurAmount });
+      if (l.type === 'logo') Object.assign(base, { w:l.w, h:l.h, opacity:l.opacity, file:l.file });
+      return base;
+    }),
+    created_at: new Date().toISOString()
+  };
+}
+
+function showJSON() {
+  document.getElementById('jsonPre').textContent = JSON.stringify(buildConfig(), null, 2);
+  document.getElementById('jsonModal').classList.add('show');
+}
+
+async function saveTemplate() {
+  const config = buildConfig();
+  // Upload logos
+  for (const l of layers) {
+    if (l.type === 'logo' && l.dataUrl && l.file) {
+      try {
+        const resp = await fetch(l.dataUrl);
+        const blob = await resp.blob();
+        const fd = new FormData();
+        fd.append('logo', blob, l.file);
+        const r = await fetch('/upload-logo', { method:'POST', body:fd });
+        const j = await r.json();
+        if (j.success) toast('Logo uploaded','ok');
+      } catch(err) { console.error('Logo upload err',err); }
+    }
+  }
+  // Save config
+  try {
+    const r = await fetch('/save-template', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(config) });
+    const j = await r.json();
+    if (j.success) toast('✅ Template saved!','ok');
+    else toast('Save failed: '+j.error,'err');
+  } catch(err) {
+    // Fallback download
+    const blob = new Blob([JSON.stringify(config,null,2)], {type:'application/json'});
+    const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='template_config.json'; a.click();
+    toast('Downloaded as file','ok');
+  }
+}
+
+async function testRender() {
+  const btn = document.getElementById('testRenderBtn');
+  btn.innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:2px;display:inline-block;"></span> Rendering...';
+  btn.disabled = true;
+
+  try {
+    const config = buildConfig();
+    const resp = await fetch('/test-render', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(config),
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json();
+      toast('Render failed: ' + (err.error || 'Unknown'), 'err');
+      btn.innerHTML = '<span class="icon">preview</span> Test Render';
+      btn.disabled = false;
+      return;
+    }
+
+    const blob = await resp.blob();
+    const url = URL.createObjectURL(blob);
+
+    // Show in modal
+    document.getElementById('jsonPre').innerHTML = '';
+    const modal = document.getElementById('jsonModal');
+    const pre = document.getElementById('jsonPre');
+    pre.innerHTML = `
+      <div style="text-align:center;margin-bottom:10px;">
+        <h3 style="font-size:14px;color:var(--yellow);margin-bottom:12px;">🎬 FFmpeg Test Render — This is EXACTLY what your video will look like</h3>
+        <p style="font-size:11px;color:var(--text2);margin-bottom:14px;">If positions/sizes look wrong here, adjust them in the editor. What you see below = what FFmpeg outputs.</p>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <div style="text-align:center">
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">FFmpeg Output</div>
+          <img src="${url}" style="max-height:70vh;border-radius:6px;border:2px solid var(--yellow);box-shadow:0 4px 20px rgba(0,0,0,.5);" />
+        </div>
+      </div>
+    `;
+    modal.classList.add('show');
+    toast('✅ Test render complete!', 'ok');
+  } catch(err) {
+    toast('Error: ' + err.message, 'err');
+  }
+  btn.innerHTML = '<span class="icon">preview</span> Test Render';
+  btn.disabled = false;
+}
+
+function resetAll() {
+  if (!confirm('Reset all layers?')) return;
+  layers = []; selectedId = null; nextId = 1; renderAll();
+  toast('Reset!','ok');
+}
+
+function toast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ═══════════════ LOAD SAVED / DEFAULT LAYERS ═══════════════
+async function loadTemplate() {
+  try {
+    const resp = await fetch('/load-template');
+    if (resp.ok) {
+      const config = await resp.json();
+      if (config.layers && config.layers.length > 0) {
+        layers = [];
+        nextId = 1;
+        for (const saved of config.layers) {
+          const id = nextId++;
+          const base = { id, type:saved.type, name:saved.name||`Layer ${id}`, visible:saved.visible!==false, x:saved.x||0, y:saved.y||0 };
+
+          if (saved.type === 'bar') {
+            Object.assign(base, { w:saved.w||VW, h:saved.h||120, color:saved.color||'#000000', opacity:saved.opacity??0.85 });
+          }
+          else if (saved.type === 'text') {
+            Object.assign(base, {
+              content:saved.content||'Text', isDynamic:!!saved.isDynamic, dynamicSource:saved.dynamicSource||'auto',
+              dayFormat:saved.dayFormat||'Day {day}',
+              font:saved.font||'Poppins, sans-serif', size:saved.size||36, weight:saved.weight||700,
+              color:saved.color||'#ffffff', shadowPx:saved.shadowPx||0, letterSpacing:saved.letterSpacing||0
+            });
+          }
+          else if (saved.type === 'blur') {
+            Object.assign(base, { w:saved.w||200, h:saved.h||200, blurAmount:saved.blurAmount||15 });
+          }
+          else if (saved.type === 'logo') {
+            Object.assign(base, { w:saved.w||80, h:saved.h||80, opacity:saved.opacity??1, file:saved.file||null, dataUrl:null });
+          }
+
+          layers.push(base);
+        }
+        renderAll();
+        toast('📂 Saved template loaded!', 'ok');
+        return;
+      }
+    }
+  } catch(e) {
+    console.log('No saved template, using defaults');
+  }
+
+  // Fallback: default layers
+  layers.push({ id:nextId++, type:'bar', name:'Top Bar', visible:true, color:'#000000', opacity:0.85, x:0, y:0, w:VW, h:120 });
+  layers.push({ id:nextId++, type:'text', name:'Movie Title', visible:true, content:'Bagheera (2024)', isDynamic:true, dynamicSource:'auto',
+    font:'Poppins, sans-serif', size:38, weight:700, color:'#ffffff', shadowPx:3, x:40, y:35, letterSpacing:0 });
+  renderAll();
+}
+loadTemplate();
+</script>
+</body>
+</html>

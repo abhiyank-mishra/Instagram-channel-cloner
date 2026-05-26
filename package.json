@@ -1,0 +1,23 @@
+{
+  "name": "instagram-movies-for-you",
+  "version": "1.0.0",
+  "description": "Automation to collect and download all reels from @findinggoodmovie.s",
+  "type": "module",
+  "scripts": {
+    "collect-links": "node src/01_collect_links.js",
+    "download": "node src/02_download_reels.js",
+    "download-reels": "node src/02_download_reels.js",
+    "editor": "node src/serve_editor.js",
+    "edit": "node src/03_edit_reels.js",
+    "edit-reels": "node src/03_edit_reels.js",
+    "generate-tags": "node src/04_generate_tags.js",
+    "dashboard": "node src/serve_dashboard.js",
+    "run-all": "node src/01_collect_links.js && node src/02_download_reels.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "puppeteer": "^23.11.1"
+  }
+}

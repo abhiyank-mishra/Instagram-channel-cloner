@@ -1,0 +1,101 @@
+{
+  "video": {
+    "width": 1080,
+    "height": 1920
+  },
+  "layers": [
+    {
+      "type": "bar",
+      "name": "Top Bar",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "w": 1080,
+      "h": 525,
+      "color": "#000000",
+      "opacity": 1
+    },
+    {
+      "type": "text",
+      "name": "Date Title",
+      "visible": true,
+      "x": 44,
+      "y": 224,
+      "content": "Day {day}",
+      "isDynamic": true,
+      "dynamicSource": "day_counter",
+      "font": "Poppins, sans-serif",
+      "size": 48,
+      "weight": 800,
+      "color": "#ffffff",
+      "shadowPx": 3,
+      "letterSpacing": 0,
+      "dayFormat": "Day {day}"
+    },
+    {
+      "type": "text",
+      "name": "For You",
+      "visible": true,
+      "x": 43,
+      "y": 431,
+      "content": "For You",
+      "isDynamic": false,
+      "dynamicSource": "auto",
+      "font": "Poppins, sans-serif",
+      "size": 47,
+      "weight": 700,
+      "color": "#b9dc09",
+      "shadowPx": 3,
+      "letterSpacing": 1
+    },
+    {
+      "type": "text",
+      "name": "brand",
+      "visible": true,
+      "x": 430,
+      "y": 1249,
+      "content": "@7devass",
+      "isDynamic": false,
+      "dynamicSource": "auto",
+      "font": "Poppins, sans-serif",
+      "size": 40,
+      "weight": 900,
+      "color": "#ffffff",
+      "shadowPx": 3,
+      "letterSpacing": 1
+    },
+    {
+      "type": "text",
+      "name": "Text 5",
+      "visible": true,
+      "x": 40,
+      "y": 1482,
+      "content": "Movie Name",
+      "isDynamic": true,
+      "dynamicSource": "auto",
+      "font": "Poppins, sans-serif",
+      "size": 50,
+      "weight": 900,
+      "color": "#ffffff",
+      "shadowPx": 3,
+      "letterSpacing": 1
+    },
+    {
+      "type": "text",
+      "name": "space",
+      "visible": true,
+      "x": 47,
+      "y": 326,
+      "content": "Of finding best movies for you",
+      "isDynamic": false,
+      "dynamicSource": "auto",
+      "font": "Poppins, sans-serif",
+      "size": 48,
+      "weight": 800,
+      "color": "#ffffff",
+      "shadowPx": 3,
+      "letterSpacing": 0
+    }
+  ],
+  "created_at": "2026-05-26T10:45:23.641Z"
+}
